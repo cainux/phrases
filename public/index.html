@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ljubljana Phrases</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Slovenian">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#f6f7f6;--card:#fff;--text:#14201e;--muted:#5b6b68;--accent:#0f766e;--line:#dfe5e3;--chip:#e6f2f0;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0e1514;--card:#16201f;--text:#e8f0ee;--muted:#9bb0ac;--accent:#5eead4;--line:#243230;--chip:#1b2c2a}
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) calc(24px + env(safe-area-inset-bottom)) env(safe-area-inset-left)}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 14px 8px;border-bottom:1px solid var(--line)}
+h1{font-size:20px;margin:0 0 8px}
+h1 small{font-weight:400;color:var(--muted);font-size:13px;margin-left:6px}
+input[type=search]{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:16px}
+main{padding:10px 12px;max-width:640px;margin:0 auto}
+details{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden}
+summary{list-style:none;padding:14px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--accent);font-size:22px;line-height:1}
+details[open] summary::after{content:"–"}
+.row{padding:11px 14px;border-top:1px solid var(--line)}
+.sl{font-size:19px;font-weight:650}
+.pr{color:var(--accent);font-size:15px;margin-top:1px}
+.en{color:var(--muted);font-size:14px;margin-top:1px}
+.note{padding:12px 14px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+.note b{color:var(--text)}
+.hide{display:none}
+.empty{text-align:center;color:var(--muted);padding:30px}
+.status{font-size:12px;color:var(--muted);text-align:center;margin-top:14px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Ljubljana <small>Slovenski jezik</small></h1>
+  <input id="q" type="search" placeholder="Search English or Slovenian…" autocomplete="off" autocapitalize="off" spellcheck="false">
+</header>
+<main id="app"></main>
+<div class="status" id="status"></div>
+
+<script>
+const DATA = [
+  {t:"Greetings", open:true, items:[
+    ["Živjo","ZHEEV-yoh","Hi (casual)"],
+    ["Dober dan","DOH-bair dahn","Good day (safe, polite)"],
+    ["Dobro jutro","DOH-broh YOO-troh","Good morning"],
+    ["Dober večer","DOH-bair VEH-chair","Good evening"],
+    ["Lahko noč","LAH-koh nohch","Good night"],
+    ["Kako ste?","KAH-koh steh","How are you? (polite)"],
+    ["Dobro, hvala","DOH-broh HVAH-lah","Fine, thanks"],
+    ["Nasvidenje","nah-SVEE-den-yeh","Goodbye (polite)"],
+    ["Adijo / Čau","ah-DEE-yoh / chow","Bye (casual)"]
+  ]},
+  {t:"Essentials", open:true, items:[
+    ["Hvala","HVAH-lah","Thank you"],
+    ["Najlepša hvala","nye-LEP-shah HVAH-lah","Thank you very much"],
+    ["Prosim","PROH-seem","Please / you're welcome"],
+    ["Ja / Ne","yah / neh","Yes / No"],
+    ["Oprostite","oh-PROH-stee-teh","Excuse me / sorry"],
+    ["Ne razumem","neh rah-ZOO-mem","I don't understand"],
+    ["Počasneje, prosim","poh-CHAHS-neh-yeh PROH-seem","Slower, please"],
+    ["Ali govorite angleško?","AH-lee goh-VOH-ree-teh ahn-GLEHSH-koh","Do you speak English?"],
+    ["Ne govorim slovensko","neh goh-VOH-reem sloh-VEN-skoh","I don't speak Slovenian"],
+    ["Samo malo","SAH-moh MAH-loh","Only a little"]
+  ]},
+  {t:"Breaking the ice", open:true, items:[
+    ["Me veseli","meh VEH-seh-lee","Nice to meet you"],
+    ["Prihajam iz Londona","pree-HAH-yam eez LON-doh-nah","I'm from London"],
+    ["Od kod ste?","ohd kohd steh","Where are you from?"],
+    ["Prvič sem v Ljubljani","PUR-vich sem v lyoo-BLYAH-nee","It's my first time in Ljubljana"],
+    ["Ljubljana je čudovita","lyoo-BLYAH-nah yeh choo-DOH-vee-tah","Ljubljana is beautiful"],
+    ["Zelo lepo mesto","ZEH-loh LEH-poh MEH-stoh","Very nice city"],
+    ["Kaj priporočate?","kye pree-poh-ROH-chah-teh","What do you recommend?"],
+    ["Kje najdem dobro kavo?","kyeh NYE-dem DOH-broh KAH-voh","Where can I find good coffee?"],
+    ["Kakšna je vaša najljubša jed?","KAHK-shnah yeh VAH-shah nye-LYOOB-shah yed","What's your favourite dish?"]
+  ]},
+  {t:"Svelte Summit", items:[
+    ["Sem na konferenci","sem nah kon-feh-REN-tsee","I'm here for a conference"],
+    ["Sem razvijalec programske opreme","sem rahz-vee-YAH-lets proh-GRAHM-skeh oh-PREH-meh","I'm a software developer"],
+    ["Kaj delate?","kye deh-LAH-teh","What do you do?"],
+    ["Kje je dvorana?","kyeh yeh dvoh-RAH-nah","Where is the hall?"],
+    ["Dunajska cesta","doo-NYE-skah TSEH-stah","Dunajska street (venue)"],
+    ["Odlična predstavitev!","od-LEECH-nah pred-stah-VEE-tev","Great talk!"]
+  ]},
+  {t:"Cafés & restaurants", items:[
+    ["Kavo, prosim","KAH-voh PROH-seem","A coffee, please"],
+    ["Pivo, prosim","PEE-voh PROH-seem","A beer, please"],
+    ["Vodo, prosim","VOH-doh PROH-seem","Water, please"],
+    ["Mizo za dva","MEE-zoh zah dvah","A table for two"],
+    ["Dober tek","DOH-bair tek","Bon appétit"],
+    ["Zelo okusno","ZEH-loh oh-KOOS-noh","Very tasty"],
+    ["Račun, prosim","RAH-choon PROH-seem","The bill, please"],
+    ["Na zdravje! / Živeli!","nah ZDRAH-vyeh / zhee-VEH-lee","Cheers!"],
+    ["Kremna rezina","KREM-nah reh-ZEE-nah","Cream cake from Bled"],
+    ["Kranjska klobasa","KRAHN-skah kloh-BAH-sah","Carniolan sausage"]
+  ]},
+  {t:"Getting around", items:[
+    ["Kje je …?","kyeh yeh","Where is …?"],
+    ["Kje je stranišče?","kyeh yeh strah-NEESH-cheh","Where is the toilet?"],
+    ["Koliko stane?","koh-LEE-koh STAH-neh","How much is it?"],
+    ["Levo / Desno / Naravnost","LEH-voh / DES-noh / nah-RAHV-nost","Left / Right / Straight"],
+    ["Letališče","leh-TAH-leesh-cheh","Airport"],
+    ["Železniška postaja","zheh-LEZ-neesh-kah poh-STAH-yah","Train station"],
+    ["Hotel Lev","hoh-TEL lev","Your hotel (Exe Lev)"]
+  ]},
+  {t:"Numbers 1–10", items:[
+    ["1 ena","EH-nah",""],["2 dve","dveh",""],["3 tri","tree",""],["4 štiri","SHTEE-ree",""],["5 pet","pet",""],
+    ["6 šest","shest",""],["7 sedem","SEH-dem",""],["8 osem","OH-sem",""],["9 devet","DEH-vet",""],["10 deset","DEH-set",""]
+  ]},
+  {t:"Pronunciation tips", notes:[
+    "<b>č</b> = “ch” (čau), <b>š</b> = “sh” (šest), <b>ž</b> = “zh” like the s in “measure” (živjo).",
+    "<b>j</b> sounds like English “y”. <b>lj</b> is like “ly” in “million”. <b>nj</b> is like “ny” in “canyon”.",
+    "<b>c</b> = “ts”. <b>h</b> is a breathy h, a little rougher than English.",
+    "Slovenian has formal <b>vi</b> and casual <b>ti</b>. Use polite forms with strangers; Slovenes soften quickly, and <b>Živjo</b> is fine in casual spots and among developers.",
+    "Slovenia ≠ Slovakia ≠ Croatia. Say <b>Slovenija</b> (sloh-VEH-nee-yah) and you'll earn a smile.",
+    "Most people speak excellent English. Starting in Slovenian, even badly, goes down very well."
+  ]}
+];
+
+const app = document.getElementById('app');
+const q = document.getElementById('q');
+const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[čć]/g,'c').replace(/š/g,'s').replace(/ž/g,'z');
+
+function render(filter){
+  const f = norm(filter||'').trim();
+  let html = '', any = false;
+  for (const sec of DATA){
+    if (sec.notes){
+      if (f) continue;
+      any = true;
+      html += `<details><summary>${esc(sec.t)}</summary>${sec.notes.map(n=>`<div class="note">${n}</div>`).join('')}</details>`;
+      continue;
+    }
+    const rows = sec.items.filter(([s,p,e]) => !f || norm(s+' '+p+' '+e).includes(f));
+    if (!rows.length) continue;
+    any = true;
+    html += `<details ${(sec.open||f)?'open':''}><summary>${esc(sec.t)}</summary>` +
+      rows.map(([s,p,e]) => `<div class="row"><div class="sl">${esc(s)}</div><div class="pr">${esc(p)}</div>${e?`<div class="en">${esc(e)}</div>`:''}</div>`).join('') + `</details>`;
+  }
+  app.innerHTML = any ? html : '<div class="empty">No matches</div>';
+}
+q.addEventListener('input', () => render(q.value));
+render('');
+
+const st = document.getElementById('status');
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('sw.js').then(() => {
+    st.textContent = navigator.onLine ? 'Saving for offline use…' : 'Offline mode';
+    navigator.serviceWorker.ready.then(() => { st.textContent = 'Ready for offline use ✓'; });
+  }).catch(() => { st.textContent = ''; });
+}
+</script>
+</body>
+</html>
