@@ -7,7 +7,7 @@ Offline Slovenian phrasebook PWA. Static files in `public/`, deployed to Cloudfl
 2. In this repo: Settings > Secrets and variables > Actions, add:
    - `CLOUDFLARE_API_TOKEN`
    - `CLOUDFLARE_ACCOUNT_ID` (Workers & Pages overview, right-hand sidebar)
-3. Push to `main`. The site appears at `https://ljubljana-phrases.<your-subdomain>.workers.dev`.
+3. Push to `main`. The site appears at `https://phrases.<your-subdomain>.workers.dev`.
 
 ## Updating
 Bump `CACHE` in `public/sw.js` (e.g. `lj-phrases-v2`) when you change files, so installed copies refresh.
