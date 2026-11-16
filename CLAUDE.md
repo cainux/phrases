@@ -4,12 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Offline Slovenian phrasebook PWA ("Ljubljana Phrases"). No build step, no package.json, no tests, no linter: everything served is a static file in `public/`. Deployed as Cloudflare Workers static assets (`wrangler.jsonc`, worker name `phrases`, custom domain `phrases.oha.me`) by `.github/workflows/deploy.yml` on every push to `main`.
+Offline Slovenian phrasebook PWA ("Ljubljana Phrases"). No build step, no package.json, no tests, no linter: everything served is a static file in `public/`. Deployed as Cloudflare Workers static assets (`wrangler.jsonc`, worker name `phrases`, custom domain `phrases.oha.me`) by Cloudflare Workers Builds (Git integration set up in the Cloudflare dashboard, not in this repo) on every push to `main`. There is no GitHub Actions workflow.
 
 ## Commands
 
 - Local preview: `npx wrangler dev`
-- Deploy: push to `main` (needs `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repo secrets). Manual: `npx wrangler deploy`.
+- Deploy: push to `main`, then check the "Workers Builds: phrases" check on the commit. Manual: `npx wrangler deploy`.
 
 ## Architecture
 
@@ -22,4 +22,5 @@ Offline Slovenian phrasebook PWA ("Ljubljana Phrases"). No build step, no packag
 
 - **Bump `CACHE` in `public/sw.js`** (e.g. `lj-phrases-v1` → `v2`) whenever you change any cached file. Installed copies serve the old cache until it changes.
 - If you add a new static asset, add it to `ASSETS` in `sw.js` or it won't be available offline.
+- Cloudflare serves `/index.html` as a redirect to `/`. `sw.js` strips the redirect flag from responses (`clean()`) because Safari refuses redirected responses from a service worker. Keep that when changing the fetch logic.
 - The `oha.me` zone must be on the same Cloudflare account for the custom-domain route to work.
